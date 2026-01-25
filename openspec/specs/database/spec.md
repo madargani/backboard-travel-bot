@@ -38,31 +38,81 @@ The system SHALL provide a Prisma schema file that defines the database models a
 - **THEN** The connection string is properly formatted for PostgreSQL
 
 ### Requirement: User Model
-The system SHALL provide a User model to store user information synchronized from Clerk authentication with Backboard.io integration.
+The system SHALL provide a User model to store user information synchronized from Clerk authentication with Backboard.io integration and session management.
 
 #### Scenario: User model structure
 - **WHEN** examining the Prisma schema
 - **THEN** A `User` model is defined with fields:
-  - id: String @id @default(cuid())
+  - id: String @id @default(uuid()) (primary key)
   - clerkId: String @unique (Clerk user ID for authentication mapping)
   - assistantId: String @unique (Backboard assistant ID, one-to-one relationship)
-  - threadIds: String[] (array of Backboard thread IDs, supports multiple conversations)
   - email: String (user's email address)
   - name: String? (user's display name, optional)
   - createdAt: DateTime @default(now()) (record creation timestamp)
-  - updatedAt: DateTime @updatedAt (last update timestamp)
 
 #### Scenario: User data storage
 - **WHEN** a new user is created in Clerk
 - **THEN** a corresponding record is created in the User table in the database
-- **THEN** The `clerkId` references the Clerk user ID for mapping
-- **THEN** The `id` is used as a local unique identifier in the system
+- **THEN** the `clerkId` references the Clerk user ID for mapping
+- **THEN** the `id` is used as a local unique identifier in the system
 
 #### Scenario: Backboard assistant mapping
 - **WHEN** a user is created
 - **THEN** the `assistantId` stores the Backboard assistant ID (one-to-one)
-- **THEN** the `threadIds` array stores all Backboard thread IDs associated with the user
-- **THEN** the user can have multiple threads but shares the same assistant
+- **THEN** the `id` acts as a unique identifier in the local system
+- **THEN** the user can have multiple Sessions through the sessions relation
+
+#### Scenario: User-Sessions relation
+- **WHEN** examining the User model
+- **THEN** A `sessions` relation field exists of type `Session[]`
+- **THEN** The User can have zero or many Sessions
+- **THEN** Each Session belongs to exactly one User
+
+### Requirement: Session Model
+The system SHALL provide a Session model to represent individual trip conversations, linking users to Backboard thread IDs.
+
+#### Scenario: Session model structure
+- **WHEN** examining the Prisma schema
+- **THEN** A `Session` model is defined with fields:
+  - id: String @id @default(uuid()) (primary key)
+  - title: String? @default("New Trip") (optional trip name, defaults to "New Trip")
+  - userId: String (foreign key to User model)
+  - threadId: String (Backboard thread ID for this session)
+  - createdAt: DateTime @default(now()) (timestamp)
+
+#### Scenario: Session-User relation
+- **WHEN** a Session record is created
+- **THEN** the `userId` field references the User who owns the session
+- **THEN** a User can have multiple Sessions (one-to-many relation)
+- **THEN** Cascade delete is NOT configured (sessions persist if user reference removed)
+
+#### Scenario: Session to Backboard mapping
+- **WHEN** a Session is created
+- **THEN** the `threadId` stores exactly one Backboard thread ID
+- **THEN** each Session corresponds to a single Backboard conversation thread
+
+### Requirement: Message Model
+The system SHALL provide a Message model to store individual chat messages within sessions.
+
+#### Scenario: Message model structure
+- **WHEN** examining the Prisma schema
+- **THEN** A `Message` model is defined with fields:
+  - id: String @id @default(uuid()) (primary key)
+  - role: String (either "user" or "assistant")
+  - content: String (message text content)
+  - sessionId: String (foreign key to Session model)
+  - createdAt: DateTime @default(now()) (timestamp)
+
+#### Scenario: Message-Session relation
+- **WHEN** a Message record is created
+- **THEN** the `sessionId` field references the Session containing the message
+- **THEN** a Session can have multiple Messages (one-to-many relation)
+- **THEN** Messages are ordered by createdAt timestamp
+
+#### Scenario: Role constraint
+- **WHEN** creating a Message record
+- **THEN** the `role` field is either "user" or "assistant"
+- **THEN** no other values are allowed for the role field
 
 ### Requirement: Prisma Client Singleton
 The system SHALL provide a singleton instance of Prisma Client for use across the application.
