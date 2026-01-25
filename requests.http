@@ -1,0 +1,92 @@
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@devUserId = user_dev_test_123
+
+###
+# ==============================
+# DEV BYPASS AUTHENTICATION
+# ==============================
+# When running locally (NODE_ENV=development), endpoints accept either:
+# 1. Clerk JWT Authorization header (production)
+# 2. X-Dev-User-ID header (development only)
+#
+# Set environment variable:
+# - devUserId: Any string to use as your Clerk ID for testing
+# ==============================
+
+### List all sessions (dev bypass)
+# Uses X-Dev-User-ID header for local development
+GET {{baseUrl}}/api/sessions
+X-Dev-User-ID: {{devUserId}}
+
+### Create a new session (dev bypass)
+# Creates a new session with default title "New Trip"
+POST {{baseUrl}}/api/sessions
+X-Dev-User-ID: {{devUserId}}
+Content-Type: {{contentType}}
+
+### Get session messages (dev bypass)
+# Returns session with all messages
+# Replace {{session_id}} with actual session ID from creation response
+GET {{baseUrl}}/api/sessions/{{session_id}}
+X-Dev-User-ID: {{devUserId}}
+
+### Send chat message (dev bypass)
+# Sends a message and receives streaming AI response
+# Replace {{session_id}} with actual session ID
+POST {{baseUrl}}/api/sessions/{{session_id}}/chat
+X-Dev-User-ID: {{devUserId}}
+Content-Type: {{contentType}}
+
+{
+  "content": "Help me plan a trip to Paris"
+}
+
+### Test unauthorized (no auth, no bypass)
+# Should return 401 Unauthorized
+GET {{baseUrl}}/api/sessions
+
+### Test non-existent session (dev bypass)
+# Should return 404 Not Found
+# Replace {{session_id}} with any valid-looking UUID
+GET {{baseUrl}}/api/sessions/{{session_id}}
+X-Dev-User-ID: {{devUserId}}
+
+### Test invalid message content (dev bypass)
+# Should return 400 Bad Request
+POST {{baseUrl}}/api/sessions/{{session_id}}/chat
+X-Dev-User-ID: {{devUserId}}
+Content-Type: {{contentType}}
+
+{}
+
+### Test empty message content (dev bypass)
+# Should return 400 Bad Request
+POST {{baseUrl}}/api/sessions/{{session_id}}/chat
+X-Dev-User-ID: {{devUserId}}
+Content-Type: {{contentType}}
+
+{
+  "content": ""
+}
+
+###
+# ==============================
+# OPTIONAL: PROD AUTHENTICATION
+# ==============================
+# To test with real Clerk authentication instead of dev bypass:
+# 1. Set clerk_token environment variable (your Clerk JWT)
+# 2. Remove X-Dev-User-ID header
+# 3. Use Authorization: Bearer {{clerk_token}} header
+#
+# Example:
+# GET {{baseUrl}}/api/sessions
+# Authorization: Bearer {{clerk_token}}
+# ==============================
+
+###
+# Environment Variables Setup
+# Set these in your HTTP client (VS Code REST Client, etc.):
+# - devUserId: Your test Clerk ID for local development (e.g., "user_dev_test_123")
+# - session_id: Copy from response of POST /api/sessions
+# - clerk_token: Your real Clerk JWT token (for production auth testing)
