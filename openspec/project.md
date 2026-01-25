@@ -9,7 +9,7 @@
 - **Framework:** Next.js 14+ (App Router) - Full Stack (Frontend + API Routes)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS + shadcn/ui
-- **Database:** Vercel Postgres (via Prisma ORM)
+- **Database:** Prisma Postgres
 - **Auth:** Clerk (Client-side implementation)
 - **AI & Memory:** **Backboard.io** + Vercel AI SDK
 
@@ -60,5 +60,5 @@
 
 - **Backboard.io:** **(Critical)** Provides the Agent logic and Persistent Memory.
 - **Clerk:** User Authentication.
-- **Vercel Postgres:** Serverless SQL Database.
+- **Prisma Postgres:** Instant Severless Postgres.
 - **Vercel AI SDK:** Streamlines the chat UI and streaming responses.
