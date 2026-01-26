@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { headers } from "next/headers"
 import { prisma } from "./prisma"
+import { backboard } from "./backboard"
 
 export async function getCurrentUser(): Promise<string> {
   const { userId } = await auth()
@@ -35,6 +36,18 @@ export async function ensureUserExists(clerkId: string) {
         email: "user@example.com",
         name: null,
       },
+    })
+  }
+
+  if (!user || !user.assistantId) {
+    const assistant = await backboard.createAssistant({
+      name: "Travel Assistant",
+      system_prompt: "You are a helpful and knowledgeable AI assistant. Your goal is to answer the user's questions clearly, accurately, and concisely. Avoid unnecessary conversational filler.",
+    })
+
+    user = await prisma.user.update({
+      where: { id: user.id },
+      data: { assistantId: assistant.assistantId },
     })
   }
 
