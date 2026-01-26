@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
+import { backboard } from "@/lib/backboard"
 import { z } from "zod"
 
 const chatRequestSchema = z.object({
@@ -40,47 +41,29 @@ export async function POST(
     })
 
     const encoder = new TextEncoder()
+
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const apiKey = process.env.BACKBOARD_API_KEY
-          const apiUrl = process.env.BACKBOARD_API_URL
-
-          if (!apiKey || !apiUrl) {
-            throw new Error("Backboard API configuration missing")
-          }
-
-          const response = await fetch(`${apiUrl}/threads/${session.threadId}/run`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-              threadId: session.threadId,
-              message: userMessage.content,
-            }),
-          })
-
-          if (!response.ok) {
-            throw new Error(`Backboard API returned ${response.status}`)
-          }
+          const responseStream = await backboard.addMessage(session.threadId, {
+            content: userMessage.content,
+            stream: true,
+            llm_provider: "openai",
+            model_name: "gpt-5-nano",
+          }) as AsyncGenerator<{ type: string; content?: string }>
 
           const chunks: string[] = []
-          const reader = response.body?.getReader()
 
-          if (!reader) {
-            throw new Error("No response body")
+          for await (const chunk of responseStream) {
+            if (chunk.type === "content_streaming" && chunk.content) {
+              chunks.push(chunk.content)
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ content: chunk.content })}\n\n`)
+              )
+            }
           }
 
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-
-            const chunk = new TextDecoder().decode(value)
-            chunks.push(chunk)
-            controller.enqueue(encoder.encode(chunk))
-          }
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"))
 
           await prisma.message.create({
             data: {

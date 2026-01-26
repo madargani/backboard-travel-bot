@@ -19,6 +19,7 @@
     "@prisma/adapter-pg": "7.3.0",
     "@prisma/client": "7.3.0",
     "ai": "^6.0.49",
+    "backboard-sdk": "^1.4.7",
     "next": "^16.1.4",
     "prisma": "7.3.0",
     "react": "^19.0.0",
