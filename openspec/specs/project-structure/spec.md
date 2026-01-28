@@ -17,6 +17,7 @@ The system SHALL provide a standard Next.js 14+ application with App Router arch
 - **THEN** Next.js development server starts on port 3000
 - **THEN** the root page renders a default Next.js page
 - **THEN** hot module reloading works for file changes
+- **THEN** the `components/` directory contains reusable UI components for the chat interface
 
 #### Scenario: TypeScript configuration
 - **WHEN** a TypeScript file is created in the project
