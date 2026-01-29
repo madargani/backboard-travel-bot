@@ -53,7 +53,7 @@ export async function POST(
     }
 
     const content = lastMessage.parts
-      .map((part) => (part.type === "text" ? part.text : ""))
+      .map((part: any) => (part.type === "text" ? part.text : ""))
       .join("");
 
     if (!content) {
@@ -97,14 +97,6 @@ export async function POST(
             data: {
               role: "assistant",
               content: chunks.join(""),
-              sessionId: params.id,
-            },
-          });
-
-          await prisma.message.create({
-            data: {
-              role: "assistant",
-              content: "Generated response",
               sessionId: params.id,
             },
           });
