@@ -92,16 +92,18 @@ export async function POST(
               chunk.type === "tool_submit_required" &&
               chunk.tool_calls
             ) {
-              const toolOutputs = chunk.tool_calls.map((tc: any) => {
-                let toolArgs = JSON.parse(tc.function.arguments);
+              const toolOutputs = await Promise.all(
+                chunk.tool_calls.map(async (tc: any) => {
+                  let toolArgs = JSON.parse(tc.function.arguments);
 
-                const output = executeTool(tc.function.name, toolArgs);
+                  const output = await executeTool(tc.function.name, toolArgs);
 
-                return {
-                  tool_call_id: tc.id,
-                  output,
-                };
-              });
+                  return {
+                    tool_call_id: tc.id,
+                    output,
+                  };
+                }),
+              );
 
               const toolStream = (await backboard.submitToolOutputs(
                 session.threadId,

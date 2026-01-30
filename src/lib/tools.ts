@@ -7,8 +7,9 @@
 /**
  * ToolFunction represents a function that implements a tool.
  * It accepts arguments object and returns any JSON-serializable output.
+ * Supports both synchronous and asynchronous functions.
  */
-export type ToolFunction = (args: any) => any;
+export type ToolFunction = (args: any) => any | Promise<any>;
 
 /**
  * ToolDefinition describes a tool's metadata and implementation.
@@ -67,7 +68,7 @@ class ToolRegistry {
    * @param args - Arguments to pass to the tool function
    * @returns JSON string of the tool output or error message
    */
-  executeTool(name: string, args: any): string {
+  async executeTool(name: string, args: any): Promise<string> {
     const tool = this.registry.get(name);
 
     if (!tool) {
@@ -77,7 +78,7 @@ class ToolRegistry {
     }
 
     try {
-      const output = tool.function(args);
+      const output = await tool.function(args);
 
       // Validate output is JSON-serializable
       const jsonOutput = JSON.stringify(output);
@@ -136,7 +137,7 @@ export function registerTool(
 /**
  * Execute a tool. Convenience function that wraps the registry method.
  */
-export function executeTool(name: string, args: any): string {
+export async function executeTool(name: string, args: any): Promise<string> {
   return registry.executeTool(name, args);
 }
 
@@ -153,4 +154,3 @@ export function getTool(name: string): ToolDefinition | undefined {
 export function getAllTools(): ToolDefinition[] {
   return registry.getAllTools();
 }
-

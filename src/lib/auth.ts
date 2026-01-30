@@ -4,6 +4,10 @@ import { prisma } from "./prisma";
 import { backboard } from "./backboard";
 import { getAllTools } from "./tools";
 import "./tools/weather";
+import "./tools/flights";
+import "./tools/hotels";
+import "./tools/activities";
+import "./tools/locations";
 
 export async function getCurrentUser(): Promise<string> {
   const { userId } = await auth();
