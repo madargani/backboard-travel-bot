@@ -72,14 +72,13 @@ export async function POST(
       },
     });
 
-    const encoder = new TextEncoder();
-
     const stream = new ReadableStream({
       async start(controller) {
         try {
           const responseStream = (await backboard.addMessage(session.threadId, {
             content: userMessage.content,
             stream: true,
+            memory: "Auto",
             llm_provider: "openai",
             model_name: "gpt-5-nano",
           })) as AsyncGenerator<any>;
