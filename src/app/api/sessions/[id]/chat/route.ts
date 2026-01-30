@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { backboard } from "@/lib/backboard";
+import { executeTool } from "@/lib/tools";
 import { z } from "zod";
 
 const messagePartSchema = z.object({
@@ -76,30 +77,76 @@ export async function POST(
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const stream = (await backboard.addMessage(session.threadId, {
+          const responseStream = (await backboard.addMessage(session.threadId, {
             content: userMessage.content,
             stream: true,
             llm_provider: "openai",
             model_name: "gpt-5-nano",
-          })) as AsyncGenerator<{ type: string; content?: string }>;
+          })) as AsyncGenerator<any>;
 
           const chunks: string[] = [];
-          for await (const chunk of stream) {
+          for await (const chunk of responseStream) {
             if (chunk.type === "content_streaming" && chunk.content) {
               chunks.push(chunk.content);
               controller.enqueue(chunk.content);
+            } else if (
+              chunk.type === "tool_submit_required" &&
+              chunk.tool_calls
+            ) {
+              const toolOutputs = chunk.tool_calls.map((tc: any) => {
+                let toolArgs = JSON.parse(tc.function.arguments);
+
+                const output = executeTool(tc.function.name, toolArgs);
+
+                return {
+                  tool_call_id: tc.id,
+                  output,
+                };
+              });
+
+              const toolStream = (await backboard.submitToolOutputs(
+                session.threadId,
+                chunk.run_id,
+                toolOutputs,
+                true,
+              )) as AsyncGenerator<any, any, any>;
+
+              for await (const toolChunk of toolStream) {
+                if (
+                  toolChunk.type === "content_streaming" &&
+                  toolChunk.content
+                ) {
+                  chunks.push(toolChunk.content);
+                  controller.enqueue(toolChunk.content);
+                } else if (toolChunk.type === "message_complete") {
+                  break;
+                }
+              }
+
+              await prisma.message.create({
+                data: {
+                  role: "assistant",
+                  content: chunks.join(""),
+                  sessionId: params.id,
+                },
+              });
+
+              controller.close();
+              return;
             } else if (chunk.type === "message_complete") {
               break;
             }
           }
 
-          await prisma.message.create({
-            data: {
-              role: "assistant",
-              content: chunks.join(""),
-              sessionId: params.id,
-            },
-          });
+          if (chunks.length > 0) {
+            await prisma.message.create({
+              data: {
+                role: "assistant",
+                content: chunks.join(""),
+                sessionId: params.id,
+              },
+            });
+          }
 
           controller.close();
         } catch (error) {

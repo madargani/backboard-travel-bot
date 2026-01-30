@@ -1,32 +1,34 @@
-import { auth } from "@clerk/nextjs/server"
-import { headers } from "next/headers"
-import { prisma } from "./prisma"
-import { backboard } from "./backboard"
+import { auth } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
+import { prisma } from "./prisma";
+import { backboard } from "./backboard";
+import { getAllTools } from "./tools";
+import "./tools/weather";
 
 export async function getCurrentUser(): Promise<string> {
-  const { userId } = await auth()
+  const { userId } = await auth();
 
   if (userId) {
-    return userId
+    return userId;
   }
 
   if (process.env.NODE_ENV === "development") {
-    const headersList = await headers()
-    const devUserId = headersList.get("x-dev-user-id")
+    const headersList = await headers();
+    const devUserId = headersList.get("x-dev-user-id");
 
     if (devUserId) {
-      console.log("⚠️ USING DEV BYPASS USER ID:", devUserId)
-      return devUserId
+      console.log("⚠️ USING DEV BYPASS USER ID:", devUserId);
+      return devUserId;
     }
   }
 
-  throw new Error("Unauthorized: User not authenticated")
+  throw new Error("Unauthorized: User not authenticated");
 }
 
 export async function ensureUserExists(clerkId: string) {
   let user = await prisma.user.findUnique({
     where: { clerkId },
-  })
+  });
 
   if (!user) {
     user = await prisma.user.create({
@@ -36,20 +38,31 @@ export async function ensureUserExists(clerkId: string) {
         email: "user@example.com",
         name: null,
       },
-    })
+    });
   }
 
   if (!user || !user.assistantId) {
+    const tools = getAllTools().map((tool) => ({
+      type: "function" as const,
+      function: {
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.parameters,
+      },
+    }));
+
     const assistant = await backboard.createAssistant({
       name: "Travel Assistant",
-      system_prompt: "You are a helpful and knowledgeable AI assistant. Your goal is to answer the user's questions clearly, accurately, and concisely. Avoid unnecessary conversational filler.",
-    })
+      system_prompt:
+        "You are a helpful and knowledgeable AI assistant. Your goal is to answer the user's questions clearly, accurately, and concisely. Avoid unnecessary conversational filler.",
+      ...(tools.length > 0 && { tools }),
+    } as any);
 
     user = await prisma.user.update({
       where: { id: user.id },
       data: { assistantId: assistant.assistantId },
-    })
+    });
   }
 
-  return user
+  return user;
 }
