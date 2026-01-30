@@ -92,11 +92,33 @@ export async function POST(
               chunk.type === "tool_submit_required" &&
               chunk.tool_calls
             ) {
+              // First, store the assistant message with tool_calls metadata
+              // This is required for OpenAI's conversation history
+              await prisma.message.create({
+                data: {
+                  role: "assistant",
+                  content: chunks.join(""),
+                  toolCalls: JSON.stringify(chunk.tool_calls),
+                  sessionId: params.id,
+                },
+              });
+
+              // Execute tools and collect outputs
               const toolOutputs = await Promise.all(
                 chunk.tool_calls.map(async (tc: any) => {
                   let toolArgs = JSON.parse(tc.function.arguments);
 
                   const output = await executeTool(tc.function.name, toolArgs);
+
+                  // Store tool message with tool_call_id
+                  await prisma.message.create({
+                    data: {
+                      role: "tool",
+                      content: JSON.stringify(output),
+                      toolCallId: tc.id,
+                      sessionId: params.id,
+                    },
+                  });
 
                   return {
                     tool_call_id: tc.id,
@@ -112,25 +134,29 @@ export async function POST(
                 true,
               )) as AsyncGenerator<any, any, any>;
 
+              const toolChunks: string[] = [];
               for await (const toolChunk of toolStream) {
                 if (
                   toolChunk.type === "content_streaming" &&
                   toolChunk.content
                 ) {
-                  chunks.push(toolChunk.content);
+                  toolChunks.push(toolChunk.content);
                   controller.enqueue(toolChunk.content);
                 } else if (toolChunk.type === "message_complete") {
                   break;
                 }
               }
 
-              await prisma.message.create({
-                data: {
-                  role: "assistant",
-                  content: chunks.join(""),
-                  sessionId: params.id,
-                },
-              });
+              // Store the final assistant response after tool execution
+              if (toolChunks.length > 0) {
+                await prisma.message.create({
+                  data: {
+                    role: "assistant",
+                    content: toolChunks.join(""),
+                    sessionId: params.id,
+                  },
+                });
+              }
 
               controller.close();
               return;

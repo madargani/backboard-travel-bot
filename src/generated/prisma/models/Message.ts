@@ -28,6 +28,8 @@ export type MessageMinAggregateOutputType = {
   id: string | null
   role: string | null
   content: string | null
+  toolCallId: string | null
+  toolCalls: string | null
   sessionId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -37,6 +39,8 @@ export type MessageMaxAggregateOutputType = {
   id: string | null
   role: string | null
   content: string | null
+  toolCallId: string | null
+  toolCalls: string | null
   sessionId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -46,6 +50,8 @@ export type MessageCountAggregateOutputType = {
   id: number
   role: number
   content: number
+  toolCallId: number
+  toolCalls: number
   sessionId: number
   createdAt: number
   updatedAt: number
@@ -57,6 +63,8 @@ export type MessageMinAggregateInputType = {
   id?: true
   role?: true
   content?: true
+  toolCallId?: true
+  toolCalls?: true
   sessionId?: true
   createdAt?: true
   updatedAt?: true
@@ -66,6 +74,8 @@ export type MessageMaxAggregateInputType = {
   id?: true
   role?: true
   content?: true
+  toolCallId?: true
+  toolCalls?: true
   sessionId?: true
   createdAt?: true
   updatedAt?: true
@@ -75,6 +85,8 @@ export type MessageCountAggregateInputType = {
   id?: true
   role?: true
   content?: true
+  toolCallId?: true
+  toolCalls?: true
   sessionId?: true
   createdAt?: true
   updatedAt?: true
@@ -157,6 +169,8 @@ export type MessageGroupByOutputType = {
   id: string
   role: string
   content: string
+  toolCallId: string | null
+  toolCalls: string | null
   sessionId: string
   createdAt: Date
   updatedAt: Date
@@ -187,6 +201,8 @@ export type MessageWhereInput = {
   id?: Prisma.StringFilter<"Message"> | string
   role?: Prisma.StringFilter<"Message"> | string
   content?: Prisma.StringFilter<"Message"> | string
+  toolCallId?: Prisma.StringNullableFilter<"Message"> | string | null
+  toolCalls?: Prisma.StringNullableFilter<"Message"> | string | null
   sessionId?: Prisma.StringFilter<"Message"> | string
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
@@ -197,6 +213,8 @@ export type MessageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  toolCallId?: Prisma.SortOrderInput | Prisma.SortOrder
+  toolCalls?: Prisma.SortOrderInput | Prisma.SortOrder
   sessionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -210,6 +228,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   role?: Prisma.StringFilter<"Message"> | string
   content?: Prisma.StringFilter<"Message"> | string
+  toolCallId?: Prisma.StringNullableFilter<"Message"> | string | null
+  toolCalls?: Prisma.StringNullableFilter<"Message"> | string | null
   sessionId?: Prisma.StringFilter<"Message"> | string
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
@@ -220,6 +240,8 @@ export type MessageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  toolCallId?: Prisma.SortOrderInput | Prisma.SortOrder
+  toolCalls?: Prisma.SortOrderInput | Prisma.SortOrder
   sessionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -235,6 +257,8 @@ export type MessageScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Message"> | string
   role?: Prisma.StringWithAggregatesFilter<"Message"> | string
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  toolCallId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  toolCalls?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   sessionId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
@@ -244,6 +268,8 @@ export type MessageCreateInput = {
   id?: string
   role: string
   content: string
+  toolCallId?: string | null
+  toolCalls?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   session: Prisma.SessionCreateNestedOneWithoutMessagesInput
@@ -253,6 +279,8 @@ export type MessageUncheckedCreateInput = {
   id?: string
   role: string
   content: string
+  toolCallId?: string | null
+  toolCalls?: string | null
   sessionId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -262,6 +290,8 @@ export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   session?: Prisma.SessionUpdateOneRequiredWithoutMessagesNestedInput
@@ -271,6 +301,8 @@ export type MessageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -280,6 +312,8 @@ export type MessageCreateManyInput = {
   id?: string
   role: string
   content: string
+  toolCallId?: string | null
+  toolCalls?: string | null
   sessionId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -289,6 +323,8 @@ export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -297,6 +333,8 @@ export type MessageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -316,6 +354,8 @@ export type MessageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  toolCallId?: Prisma.SortOrder
+  toolCalls?: Prisma.SortOrder
   sessionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -325,6 +365,8 @@ export type MessageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  toolCallId?: Prisma.SortOrder
+  toolCalls?: Prisma.SortOrder
   sessionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -334,6 +376,8 @@ export type MessageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  toolCallId?: Prisma.SortOrder
+  toolCalls?: Prisma.SortOrder
   sessionId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -385,6 +429,8 @@ export type MessageCreateWithoutSessionInput = {
   id?: string
   role: string
   content: string
+  toolCallId?: string | null
+  toolCalls?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -393,6 +439,8 @@ export type MessageUncheckedCreateWithoutSessionInput = {
   id?: string
   role: string
   content: string
+  toolCallId?: string | null
+  toolCalls?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -430,6 +478,8 @@ export type MessageScalarWhereInput = {
   id?: Prisma.StringFilter<"Message"> | string
   role?: Prisma.StringFilter<"Message"> | string
   content?: Prisma.StringFilter<"Message"> | string
+  toolCallId?: Prisma.StringNullableFilter<"Message"> | string | null
+  toolCalls?: Prisma.StringNullableFilter<"Message"> | string | null
   sessionId?: Prisma.StringFilter<"Message"> | string
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
@@ -439,6 +489,8 @@ export type MessageCreateManySessionInput = {
   id?: string
   role: string
   content: string
+  toolCallId?: string | null
+  toolCalls?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -447,6 +499,8 @@ export type MessageUpdateWithoutSessionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -455,6 +509,8 @@ export type MessageUncheckedUpdateWithoutSessionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -463,6 +519,8 @@ export type MessageUncheckedUpdateManyWithoutSessionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  toolCallId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolCalls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -473,6 +531,8 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   role?: boolean
   content?: boolean
+  toolCallId?: boolean
+  toolCalls?: boolean
   sessionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -483,6 +543,8 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   role?: boolean
   content?: boolean
+  toolCallId?: boolean
+  toolCalls?: boolean
   sessionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -493,6 +555,8 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   role?: boolean
   content?: boolean
+  toolCallId?: boolean
+  toolCalls?: boolean
   sessionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -503,12 +567,14 @@ export type MessageSelectScalar = {
   id?: boolean
   role?: boolean
   content?: boolean
+  toolCallId?: boolean
+  toolCalls?: boolean
   sessionId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "content" | "sessionId" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "content" | "toolCallId" | "toolCalls" | "sessionId" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   session?: boolean | Prisma.SessionDefaultArgs<ExtArgs>
 }
@@ -528,6 +594,8 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     role: string
     content: string
+    toolCallId: string | null
+    toolCalls: string | null
     sessionId: string
     createdAt: Date
     updatedAt: Date
@@ -958,6 +1026,8 @@ export interface MessageFieldRefs {
   readonly id: Prisma.FieldRef<"Message", 'String'>
   readonly role: Prisma.FieldRef<"Message", 'String'>
   readonly content: Prisma.FieldRef<"Message", 'String'>
+  readonly toolCallId: Prisma.FieldRef<"Message", 'String'>
+  readonly toolCalls: Prisma.FieldRef<"Message", 'String'>
   readonly sessionId: Prisma.FieldRef<"Message", 'String'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Message", 'DateTime'>
