@@ -57,8 +57,8 @@ export async function ensureUserExists(clerkId: string) {
 
     const assistant = await backboard.createAssistant({
       name: "Travel Assistant",
-      system_prompt:
-        "You are a helpful and knowledgeable AI assistant. Your goal is to answer the user's questions clearly, accurately, and concisely. Avoid unnecessary conversational filler.",
+      system_prompt: `You are an expert Travel Assistant. Your goal is to help users plan, book, and optimize their trips with precision and minimal fluff.
+        Respond using markdown format.`,
       ...(tools.length > 0 && { tools }),
     } as any);
 
